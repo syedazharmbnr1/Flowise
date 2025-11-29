@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MetLife Stadium - Ookla Q3 2025 Mobile Performance Analysis</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        .header {
+            background: linear-gradient(90deg, #0066cc 0%, #0099ff 100%);
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.9; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-value { font-size: 2.2em; font-weight: bold; color: #00ff88; }
+        .stat-label { font-size: 0.85em; color: #ccc; margin-top: 5px; }
+        .map-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 25px 0;
+        }
+        .info-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .info-section h2 { color: #00ff88; margin-bottom: 12px; }
+        .info-section p { line-height: 1.7; color: #ddd; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .data-table th, .data-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .data-table th { background: rgba(0,153,255,0.3); }
+        .download-badge {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            color: #000; padding: 2px 8px; border-radius: 15px;
+            font-weight: bold; font-size: 0.9em;
+        }
+        .upload-badge {
+            background: linear-gradient(45deg, #0099ff, #0066cc);
+            color: #fff; padding: 2px 8px; border-radius: 15px;
+            font-weight: bold; font-size: 0.9em;
+        }
+        .footer {
+            text-align: center; padding: 25px; color: #888;
+            border-top: 1px solid rgba(255,255,255,0.1); margin-top: 40px;
+        }
+        .note-box {
+            background: rgba(255, 193, 7, 0.2);
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>MetLife Stadium Network Analysis</h1>
+        <p>Ookla Speedtest Q3 2025 Mobile Performance Data</p>
+        <p style="margin-top:8px;font-size:0.9em;">40.813778N, 74.074310W | East Rutherford, NJ</p>
+    </div>
+    <div class="container">
+        <div class="note-box">
+            <strong>Note:</strong> This visualization uses sample data generated based on typical stadium mobile performance patterns. 
+            To use actual Ookla Q3 2025 data, run the <code>metlife_ookla_analysis.py</code> script or 
+            <code>MetLife_Stadium_Ookla_Analysis.ipynb</code> notebook in an environment with network access to S3.
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">27</div>
+                <div class="stat-label">Coverage Tiles</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">181.2</div>
+                <div class="stat-label">Avg Download (Mbps)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">267.9</div>
+                <div class="stat-label">Max Download (Mbps)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">32.7</div>
+                <div class="stat-label">Avg Upload (Mbps)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">29</div>
+                <div class="stat-label">Avg Latency (ms)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">7,602</div>
+                <div class="stat-label">Total Speed Tests</div>
+            </div>
+        </div>
+        <div class="map-container">
+            <div id="map" style="height: 700px;"></div>
+        </div>
+        <div class="info-section">
+            <h2>About This Analysis</h2>
+            <p>This analysis visualizes mobile network performance data from Ookla Speedtest for Q3 2025 around MetLife Stadium.</p>
+            <p style="margin-top:12px;">
+                <strong>Data Source:</strong> Ookla Open Data Initiative<br>
+                <strong>S3 Path:</strong> s3://ookla-open-data/parquet/performance/type=mobile/year=2025/quarter=3/<br>
+                <strong>Coverage Area:</strong> ~1km radius from stadium center<br>
+                <strong>Time Period:</strong> Q3 2025 (July 1 - September 30, 2025)
+            </p>
+        </div>
+        <div class="info-section">
+            <h2>Top Performing Tiles</h2>
+            <table class="data-table">
+                <thead>
+                    <tr><th>Tile</th><th>Download</th><th>Upload</th><th>Latency</th><th>Tests</th><th>Distance</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>0320263843...</code></td>
+                        <td><span class="download-badge">267.9 Mbps</span></td>
+                        <td><span class="upload-badge">50.6 Mbps</span></td>
+                        <td>18 ms</td>
+                        <td>66</td>
+                        <td>0m</td>
+                    </tr><tr>
+                        <td><code>0320282070...</code></td>
+                        <td><span class="download-badge">257.3 Mbps</span></td>
+                        <td><span class="upload-badge">47.4 Mbps</span></td>
+                        <td>15 ms</td>
+                        <td>419</td>
+                        <td>750m</td>
+                    </tr><tr>
+                        <td><code>0320276238...</code></td>
+                        <td><span class="download-badge">257.1 Mbps</span></td>
+                        <td><span class="upload-badge">32.0 Mbps</span></td>
+                        <td>20 ms</td>
+                        <td>120</td>
+                        <td>473m</td>
+                    </tr><tr>
+                        <td><code>0320231831...</code></td>
+                        <td><span class="download-badge">251.3 Mbps</span></td>
+                        <td><span class="upload-badge">31.3 Mbps</span></td>
+                        <td>26 ms</td>
+                        <td>477</td>
+                        <td>473m</td>
+                    </tr><tr>
+                        <td><code>0320241244...</code></td>
+                        <td><span class="download-badge">226.4 Mbps</span></td>
+                        <td><span class="upload-badge">18.8 Mbps</span></td>
+                        <td>19 ms</td>
+                        <td>198</td>
+                        <td>333m</td>
+                    </tr><tr>
+                        <td><code>0320284093...</code></td>
+                        <td><span class="download-badge">214.3 Mbps</span></td>
+                        <td><span class="upload-badge">35.5 Mbps</span></td>
+                        <td>42 ms</td>
+                        <td>243</td>
+                        <td>750m</td>
+                    </tr><tr>
+                        <td><code>0320231429...</code></td>
+                        <td><span class="download-badge">212.5 Mbps</span></td>
+                        <td><span class="upload-badge">31.7 Mbps</span></td>
+                        <td>27 ms</td>
+                        <td>192</td>
+                        <td>666m</td>
+                    </tr><tr>
+                        <td><code>0320231227...</code></td>
+                        <td><span class="download-badge">209.9 Mbps</span></td>
+                        <td><span class="upload-badge">42.4 Mbps</span></td>
+                        <td>25 ms</td>
+                        <td>200</td>
+                        <td>946m</td>
+                    </tr><tr>
+                        <td><code>0320223718...</code></td>
+                        <td><span class="download-badge">208.8 Mbps</span></td>
+                        <td><span class="upload-badge">28.3 Mbps</span></td>
+                        <td>19 ms</td>
+                        <td>440</td>
+                        <td>746m</td>
+                    </tr><tr>
+                        <td><code>0320245551...</code></td>
+                        <td><span class="download-badge">204.0 Mbps</span></td>
+                        <td><span class="upload-badge">30.7 Mbps</span></td>
+                        <td>40 ms</td>
+                        <td>284</td>
+                        <td>672m</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="info-section">
+            <h2>How to Run with Actual Data</h2>
+            <p>To analyze actual Ookla Q3 2025 data:</p>
+            <ol style="margin-top:10px;margin-left:20px;line-height:2;">
+                <li>Open <code>MetLife_Stadium_Ookla_Analysis.ipynb</code> in Google Colab</li>
+                <li>Run all cells - the notebook will download the ~185MB parquet file</li>
+                <li>The visualization will be generated with real data</li>
+            </ol>
+            <p style="margin-top:15px;">Or run locally:</p>
+            <pre style="background:#000;padding:10px;border-radius:5px;margin-top:10px;overflow-x:auto;">python metlife_ookla_analysis.py</pre>
+        </div>
+        <div class="footer">
+            <p>Data: Ookla Open Data | Visualization: Plotly</p>
+            <p style="margin-top:8px;">MetLife Stadium Network Performance Analysis</p>
+        </div>
+    </div>
+    <script>
+        var data = {"data":[{"fill":"toself","fillcolor":"rgba(0, 0, 255, 0.15)","hoverinfo":"name","lat":[40.8118,40.8158,40.8158,40.8118,40.8118],"line":{"color":"blue","width":3},"lon":[-74.078,-74.078,-74.0705,-74.0705,-74.078],"mode":"lines","name":"MetLife Stadium","type":"scattermap"},{"hovertemplate":"\u003cb\u003eMetLife Stadium\u003c\u002fb\u003e\u003cbr\u003eLat: %{lat:.6f}\u003cbr\u003eLon: %{lon:.6f}\u003cextra\u003e\u003c\u002fextra\u003e","lat":[40.813778],"lon":[-74.07431],"marker":{"color":"red","size":18},"mode":"markers+text","name":"Stadium Center","text":["MetLife Stadium"],"textfont":{"color":"white","size":12},"textposition":"top center","type":"scattermap"},{"hovertemplate":"\u003cb\u003eOokla Tile\u003c\u002fb\u003e\u003cbr\u003e%{text}\u003cbr\u003eLat: %{lat:.6f}\u003cbr\u003eLon: %{lon:.6f}\u003cextra\u003e\u003c\u002fextra\u003e","lat":{"dtype":"f8","bdata":"KEUr9wJnREDSNv5EZWdEQNI2\u002fkRlZ0RA0jb+RGVnREDSNv5EZWdEQNI2\u002fkRlZ0RAfCjRksdnREB8KNGSx2dEQHwo0ZLHZ0RAfCjRksdnREB8KNGSx2dEQCYapOApaERAJhqk4CloREAmGqTgKWhEQCYapOApaERAJhqk4CloREDQC3cujGhEQNALdy6MaERA0At3LoxoREDQC3cujGhEQNALdy6MaERAev1JfO5oREB6\u002fUl87mhEQHr9SXzuaERAev1JfO5oREB6\u002fUl87mhEQCTvHMpQaURA"},"lon":{"dtype":"f8","bdata":"AvG6fsGEUsCPiCmRRIVSwMk88gcDhVLAAvG6fsGEUsA7pYP1f4RSwHVZTGw+hFLAj4gpkUSFUsDJPPIHA4VSwALxun7BhFLAO6WD9X+EUsB1WUxsPoRSwI+IKZFEhVLAyTzyBwOFUsAC8bp+wYRSwDulg\u002fV\u002fhFLAdVlMbD6EUsCPiCmRRIVSwMk88gcDhVLAAvG6fsGEUsA7pYP1f4RSwHVZTGw+hFLAj4gpkUSFUsDJPPIHA4VSwALxun7BhFLAO6WD9X+EUsB1WUxsPoRSwALxun7BhFLA"},"marker":{"cmax":257.24,"cmin":0,"color":{"dtype":"f8","bdata":"ZmZmZmaWZ0AzMzMzM6NoQDMzMzMzM1lAAAAAAACQakCamZmZmRlqQDMzMzMzM1hAmpmZmZnJakAAAAAAAPBhQM3MzMzMTGxAmpmZmZlpb0AzMzMzM8NiQDMzMzMzc2hAMzMzMzPTYUBmZmZmZr5wQGZmZmZmxmFAAAAAAACAaUCamZmZmTlbQJqZmZmZEXBAzczMzMwMW0AAAAAAABBpQM3MzMzMFHBAzczMzMw8akAzMzMzM6NkQM3MzMzMLGZAmpmZmZkZaECamZmZmflmQJqZmZmZeVZA"},"colorbar":{"len":0.7,"thickness":15,"title":{"text":"Download\u003cbr\u003eSpeed\u003cbr\u003e(Mbps)"},"x":1.02},"colorscale":[[0.0,"rgb(165,0,38)"],[0.1,"rgb(215,48,39)"],[0.2,"rgb(244,109,67)"],[0.3,"rgb(253,174,97)"],[0.4,"rgb(254,224,139)"],[0.5,"rgb(255,255,191)"],[0.6,"rgb(217,239,139)"],[0.7,"rgb(166,217,106)"],[0.8,"rgb(102,189,99)"],[0.9,"rgb(26,152,80)"],[1.0,"rgb(0,104,55)"]],"opacity":0.85,"size":16},"mode":"markers","name":"Ookla Speed Tests (Q3 2025)","text":["\u003cb\u003eDownload:\u003c\u002fb\u003e 188.7 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 15.9 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 23 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 164\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 55\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 999m","\u003cb\u003eDownload:\u003c\u002fb\u003e 197.1 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 46.7 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 17 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 266\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 28\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 946m","\u003cb\u003eDownload:\u003c\u002fb\u003e 100.8 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 24.3 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 31 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 337\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 70\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 746m","\u003cb\u003eDownload:\u003c\u002fb\u003e 212.5 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 31.7 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 27 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 192\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 21\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 666m","\u003cb\u003eDownload:\u003c\u002fb\u003e 208.8 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 28.3 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 19 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 440\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 106\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 746m","\u003cb\u003eDownload:\u003c\u002fb\u003e 96.8 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 18.6 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 40 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 359\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 87\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 946m","\u003cb\u003eDownload:\u003c\u002fb\u003e 214.3 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 35.5 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 42 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 243\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 40\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 750m","\u003cb\u003eDownload:\u003c\u002fb\u003e 143.5 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 40.9 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 38 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 235\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 167\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 473m","\u003cb\u003eDownload:\u003c\u002fb\u003e 226.4 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 18.8 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 19 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 198\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 40\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 333m","\u003cb\u003eDownload:\u003c\u002fb\u003e 251.3 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 31.3 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 26 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 477\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 113\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 473m","\u003cb\u003eDownload:\u003c\u002fb\u003e 150.1 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 23.4 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 22 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 399\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 185\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 750m","\u003cb\u003eDownload:\u003c\u002fb\u003e 195.6 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 22.4 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 35 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 133\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 138\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 672m","\u003cb\u003eDownload:\u003c\u002fb\u003e 142.6 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 53.7 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 31 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 162\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 195\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 336m","\u003cb\u003eDownload:\u003c\u002fb\u003e 267.9 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 50.6 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 18 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 66\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 100\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 0m","\u003cb\u003eDownload:\u003c\u002fb\u003e 142.2 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 25.4 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 38 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 498\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 100\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 336m","\u003cb\u003eDownload:\u003c\u002fb\u003e 204.0 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 30.7 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 40 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 284\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 56\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 672m","\u003cb\u003eDownload:\u003c\u002fb\u003e 108.9 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 43.1 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 30 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 432\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 169\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 750m","\u003cb\u003eDownload:\u003c\u002fb\u003e 257.1 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 32.0 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 20 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 120\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 150\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 473m","\u003cb\u003eDownload:\u003c\u002fb\u003e 108.2 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 18.9 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 16 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 371\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 60\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 333m","\u003cb\u003eDownload:\u003c\u002fb\u003e 200.5 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 31.5 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 30 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 289\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 155\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 473m","\u003cb\u003eDownload:\u003c\u002fb\u003e 257.3 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 47.4 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 15 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 419\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 49\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 750m","\u003cb\u003eDownload:\u003c\u002fb\u003e 209.9 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 42.4 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 25 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 200\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 131\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 946m","\u003cb\u003eDownload:\u003c\u002fb\u003e 165.1 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 50.8 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 39 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 184\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 148\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 746m","\u003cb\u003eDownload:\u003c\u002fb\u003e 177.4 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 20.0 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 32 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 480\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 183\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 666m","\u003cb\u003eDownload:\u003c\u002fb\u003e 192.8 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 21.4 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 36 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 326\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 155\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 746m","\u003cb\u003eDownload:\u003c\u002fb\u003e 183.8 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 32.4 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 18 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 235\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 98\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 946m","\u003cb\u003eDownload:\u003c\u002fb\u003e 89.9 Mbps\u003cbr\u003e\u003cb\u003eUpload:\u003c\u002fb\u003e 45.7 Mbps\u003cbr\u003e\u003cb\u003eLatency:\u003c\u002fb\u003e 43 ms\u003cbr\u003e\u003cb\u003eTests:\u003c\u002fb\u003e 93\u003cbr\u003e\u003cb\u003eDevices:\u003c\u002fb\u003e 144\u003cbr\u003e\u003cb\u003eDistance:\u003c\u002fb\u003e 999m"],"type":"scattermap"}],"layout":{"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"font":{"size":20,"color":"#333"},"text":"\u003cb\u003eMetLife Stadium - Ookla Q3 2025 Mobile Performance Data\u003c\u002fb\u003e","x":0.5},"map":{"center":{"lat":40.813778,"lon":-74.07431},"style":"carto-positron","zoom":14.5},"legend":{"font":{"size":11},"yanchor":"top","y":0.99,"xanchor":"left","x":0.01,"bgcolor":"rgba(255, 255, 255, 0.9)"},"margin":{"l":0,"r":0,"t":60,"b":0},"showlegend":true,"height":800,"annotations":[{"align":"left","bgcolor":"rgba(255, 255, 255, 0.95)","bordercolor":"black","borderpad":8,"borderwidth":1,"font":{"size":11},"showarrow":false,"text":"\u003cb\u003eQ3 2025 Statistics\u003c\u002fb\u003e\u003cbr\u003eCoverage Tiles: 27\u003cbr\u003eAvg Download: 181.2 Mbps\u003cbr\u003eAvg Upload: 32.7 Mbps\u003cbr\u003eAvg Latency: 29 ms\u003cbr\u003eTotal Tests: 7,602\u003cbr\u003eTotal Devices: 2,943","x":0.01,"xref":"paper","y":0.2,"yref":"paper"}]}};
+        Plotly.newPlot('map', data.data, data.layout);
+    </script>
+</body>
+</html>
